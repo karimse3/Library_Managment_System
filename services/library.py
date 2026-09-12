@@ -16,10 +16,27 @@ class ReturnResult(Enum):
     BOOK_ALREADY_AVAILABLE = "Book already available"
     BOOK_NOT_BORROWED_BY_MEMBER = "Member didn't borrow this book"
 
+class RemoveBookResult(Enum):
+    SUCCESS = "Success"
+    BOOK_NOT_FOUND = "Book not found"
+    BOOK_BORROWED = "Book is borrowed"
+
+class RemoveMemberResult(Enum):
+    SUCCESS = "Success"
+    MEMBER_NOT_FOUND = "Member not found"
+    MEMBER_HAS_BORROWED_BOOKS = "Member has borrowed books"
+
 class Library:
+    """Represent the library.
+
+    Attributes:
+        books: Books in the library.
+        members: Members in the library.
+    """
+
     def __init__(self):
-        self.books = {}
-        self.members = {}
+        self.books: dict[int, Book] = {}
+        self.members: dict[int, Member] = {}
 
     # Methods
     #===== Book Methods =====#
@@ -29,12 +46,16 @@ class Library:
             return True
         return False
 
-    def remove_book(self, book_id: int) -> bool:
+    def remove_book(self, book_id: int) -> RemoveBookResult:
         book = self.find_book(book_id)
-        if book and book.available:
-            del self.books[book_id]
-            return True
-        return False
+        if not book :
+            return RemoveBookResult.BOOK_NOT_FOUND
+        if not book.available :
+            return RemoveBookResult.BOOK_BORROWED
+
+        del self.books[book_id]
+        return RemoveBookResult.SUCCESS
+
 
 
 
@@ -44,14 +65,6 @@ class Library:
 
     def get_books(self) -> list[Book]:
         return list(self.books.values())
-
-    def display_books(self):
-        for book in self.books.values():
-            print(f"ID :{book.book_id}")
-            print(f"Title :{book.title}")
-            print(f"Author :{book.author}")
-            print(f"ISBN :{book.isbn}")
-            print(f"Availability Status :{"Available" if book.available else "Not available" }\n")
 
     def search_books(self, keyword: str) -> list[Book]:
         results = []
@@ -74,26 +87,22 @@ class Library:
             return True
         return False
 
-    def remove_member(self, member_id: int) -> bool:
+    def remove_member(self, member_id: int) -> RemoveMemberResult:
         member = self.find_member(member_id)
-        if member and not member.borrowed_books:
-            del self.members[member_id]
-            return True
-        return False
+        if not member:
+            return RemoveMemberResult.MEMBER_NOT_FOUND
+        if member.borrowed_books :
+            return RemoveMemberResult.MEMBER_HAS_BORROWED_BOOKS
+  
+        del self.members[member_id]
+        return RemoveMemberResult.SUCCESS
+
 
     def find_member(self, member_id: int) -> Member | None :
         return self.members.get(member_id)
 
     def get_members(self) -> list[Member]:
         return list(self.members.values())
-    
-    def display_members(self):
-        for member in self.members:
-            print(f"ID :{member.member_id}")
-            print(f"Name :{member.name}")
-            print(f"Email :{member.email}")
-            print(f"Borrowed Books :{[book.title for book in member.borrowed_books
-                                      if member.borrowed_books ]}\n")
 
     def search_members(self, keyword: str) -> list[Member]:
         results = []

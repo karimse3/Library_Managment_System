@@ -1,21 +1,14 @@
 from models.book import Book
 from models.member import Member
 from services.library import Library
+from utils.display import display_book, display_member
+from utils.input_helpers import (
+    ask_for_choice,
+    ask_for_integer,
+    ask_for_text,
+    ask_for_email,
+)
 
-
-def display_book(book: Book):
-    status = "Available" if book.available else "Not available"
-    print(f"ID :{book.book_id}")
-    print(f"Title :{book.title}")
-    print(f"Author :{book.author}")
-    print(f"ISBN :{book.isbn}")
-    print(f"Availability Status :{status}")    
-
-def display_member(member: Member):
-    print(f"ID :{member.member_id}")
-    print(f"Name :{member.name}")
-    print(f"Email :{member.email}")
-    print(f"Borrowed Books :{[book.title for book in member.borrowed_books]}\n")
 
 def main():
     library = Library()
@@ -34,13 +27,13 @@ def main():
 4. Display Books
 5. Back
 """)
-        choice = int(input("Choose an option :"))
+        choice = ask_for_choice("Choose an option :", 1, 5)
         if choice == 1:
             book = Book(
-                int(input("Enter the ID :")),
-                input("Enter the title :"),
-                input("Enter the author :"),
-                input("Enter the isbn :"),
+                ask_for_integer("Enter the ID :"),
+                ask_for_text("Enter the title :"),
+                ask_for_text("Enter the author :"),
+                ask_for_text("Enter the isbn :"),
                             )
             result = library.add_book(book)
             if result:
@@ -48,14 +41,11 @@ def main():
             else :
                 print("This book already exists")
         elif choice == 2:
-            book_id = int(input("Enter the ID :"))
+            book_id = ask_for_integer("Enter the ID :")
             result = library.remove_book(book_id)
-            if result:
-                print("Book removed successfully")
-            else :
-                print("Something went wrong")
+            print(result.value)
         elif choice == 3:
-            book_id = int(input("Enter the ID :"))
+            book_id = ask_for_integer("Enter the ID :")
             book = library.find_book(book_id)
             if book :
                 display_book(book)
@@ -88,12 +78,12 @@ def main():
 4. Display Members
 5. Back
 """)
-        choice = int(input("Choose an option :"))
+        choice = ask_for_choice("Choose an option :", 1, 5)
         if choice == 1:
             member = Member(
-                int(input("Enter the ID :")),
-                input("Enter the name :"),
-                input("Enter the email :"),
+                ask_for_integer("Enter the ID :"),
+                ask_for_text("Enter the name :"),
+                ask_for_email("Enter the email :"),
                             )
             result = library.add_member(member)
             if result:
@@ -101,14 +91,11 @@ def main():
             else :
                 print("This member already exists")
         elif choice == 2:
-            member_id = int(input("Enter the ID :"))
+            member_id = ask_for_integer("Enter the ID :")
             result = library.remove_member(member_id)
-            if result:
-                print("Member removed successfully")
-            else :
-                print("Something went wrong")
+            print(result.value)
         elif choice == 3:
-            member_id = int(input("Enter the ID :"))
+            member_id = ask_for_integer("Enter the ID :")
             member = library.find_member(member_id)
             if member :
                 display_member(member)
@@ -140,7 +127,7 @@ def main():
 2. Search Member
 3. Back
 """)
-        choice = int(input("Choose an option :"))
+        choice = ask_for_choice("Choose an option :", 1, 3)
         if choice == 1:
             keyword  = str(input("Enter a title or author name: "))
             result = library.search_books(keyword)
@@ -175,19 +162,19 @@ def main():
 4. Return book
 5. Search
 6. Exit """)
-        choice = int(input("Choose an option :"))
+        choice = ask_for_choice("Choose an option :", 1, 6)
         if choice == 1:
             books_management()
         elif choice == 2:
             members_management()
         elif choice == 3:
-            book_id = int(input("Enter book ID: "))
-            member_id = int(input("Enter member ID: "))
+            book_id = ask_for_integer("Enter book ID: ")
+            member_id = ask_for_integer("Enter member ID: ")
             result = library.borrow_book(book_id, member_id)
             print(result.value)
         elif choice == 4:
-            book_id = int(input("Enter book ID: "))
-            member_id = int(input("Enter member ID: "))
+            book_id = ask_for_integer("Enter book ID: ")
+            member_id = ask_for_integer("Enter member ID: ")
             result = library.return_book(book_id, member_id)
             print(result.value)
         elif choice == 5:
